@@ -1,26 +1,26 @@
-# Hafif bir Python imajı kullanıyoruz
+# Use official lightweight Python image
 FROM python:3.12-slim
 
-# Çalışma dizinini ayarla
+# Set working directory inside container
 WORKDIR /app
 
-# Sistem bağımlılıklarını yükle (Gerekirse)
+# Install system dependencies for edge-tts (if any)
 RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Bağımlılıkları kopyala ve yükle
+# Copy requirements and install them
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Uygulama kodlarını kopyala
+# Copy the rest of the application
 COPY . .
 
-# Geçici ses klasörünü oluştur ve izinleri ayarla
+# Create audio directory with correct permissions
 RUN mkdir -p temp_audio && chmod 777 temp_audio
 
-# Uygulamanın çalışacağı portu aç
+# Expose the app port
 EXPOSE 8000
 
-# Uygulamayı başlat
+# Start the application
 CMD ["python", "main.py"]

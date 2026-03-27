@@ -25,12 +25,12 @@ const TURN_LABELS = {
     'en': 'TAP TO SPEAK',
     'de': 'ZUM SPRECHEN TIPPEN',
     'fr': 'APPUYEZ POUR PARLER',
-    'ru': 'НАЖМИТЕ, ЧТОБЫ ГОВОРИТЬ'
+    'ru': 'НАЖМИТЕ, ЧТОБЫ ГОВОRIТЬ'
 };
 
-// Web Speech Recognition
+// Web Speech Recognition setup
 const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-recognition.interimResults = true; // Show interim results
+recognition.interimResults = true; // See words in real-time
 recognition.continuous = false;
 
 startBtn.addEventListener('click', () => {
@@ -46,11 +46,11 @@ function updateUI() {
     const lang = currentTurn === 1 ? user1Lang : user2Lang;
     const isUser1 = currentTurn === 1;
     
-    // Button color and text
+    // Button color and text update
     actionBtn.style.backgroundColor = isUser1 ? '#2563eb' : '#10b981'; // Blue vs Green
     document.getElementById('btn-text').innerText = TURN_LABELS[lang] || 'SPEAK';
     
-    // Language indicator
+    // Language indicator at the top
     const langNames = {'tr': 'Turkish', 'en': 'English', 'de': 'German', 'fr': 'French', 'ru': 'Russian'};
     langIndicator.innerText = `${isUser1 ? 'Your Turn' : 'Their Turn'} (${langNames[lang]})`;
 }
@@ -65,7 +65,7 @@ function openRecorder() {
     recordOverlay.classList.remove('translate-y-full');
     recordOverlay.style.backgroundColor = currentTurn === 1 ? '#2563eb' : '#10b981';
     
-    // Reset recorder UI
+    // Reset recorder UI for new recording
     liveTranscript.innerText = "Listening...";
     liveTranscript.classList.add('opacity-60');
     recordStatus.innerText = "Speak Now";
@@ -94,7 +94,7 @@ recognition.onend = () => {
         recordStatus.innerText = "Is this correct?";
         recordActions.classList.remove('hidden');
     } else {
-        // Close or show message if nothing detected
+        // Close if no speech detected
         liveTranscript.innerText = "No voice detected.";
         setTimeout(closeRecorder, 1500);
     }
@@ -117,7 +117,9 @@ async function processTranslation() {
     const targetLang = currentTurn === 1 ? user2Lang : user1Lang;
     const targetUser = currentTurn === 1 ? 2 : 1;
 
-    // Optional: Add a temporary loading bubble here
+    // Create a temporary "Translating..." bubble
+    const loadingBubbleId = "loading-" + Date.now();
+    addTranslationToHistory(targetUser, "Translating...", null, loadingBubbleId);
     
     try {
         const translateData = new FormData();
@@ -128,14 +130,14 @@ async function processTranslation() {
         const translateRes = await fetch('/translate', { method: 'POST', body: translateData });
         const { translated_text, explanation } = await translateRes.json();
         
-        // Only add the TRANSLATION message (Hide original user message)
-        addTranslationToHistory(targetUser, translated_text, explanation);
+        // Replace the "Translating..." text with actual result
+        updateBubbleContent(loadingBubbleId, translated_text, explanation);
         
-        // Switch turns
+        // Switch turns immediately after receiving translation
         currentTurn = targetUser;
         updateUI();
 
-        // TTS (Text-to-Speech)
+        // Trigger Text-to-Speech (TTS)
         const ttsData = new FormData();
         ttsData.append('text', translated_text);
         ttsData.append('lang', targetLang);
@@ -148,22 +150,24 @@ async function processTranslation() {
         
     } catch (err) {
         console.error(err);
+        updateBubbleContent(loadingBubbleId, "Error occurred during translation.", null);
     }
 }
 
-function addTranslationToHistory(userNum, text, explanation = null) {
+function addTranslationToHistory(userNum, text, explanation = null, id = null) {
     const msgDiv = document.createElement('div');
     const isUser1Translation = userNum === 1; // Translation intended for User 1
     
     msgDiv.className = `w-full flex ${isUser1Translation ? 'justify-start' : 'justify-end'} animate-slide-up`;
+    if (id) msgDiv.id = id;
     
     let html = `
-        <div class="max-grow p-5 rounded-3xl shadow-lg border ${isUser1Translation ? 'bg-white border-slate-100 text-slate-800 rounded-bl-none' : 'bg-green-600 border-green-700 text-white rounded-br-none'}">
-            <p class="text-xl font-medium leading-snug">${text}</p>
+        <div class="bubble-content max-grow p-5 rounded-3xl shadow-lg border ${isUser1Translation ? 'bg-white border-slate-100 text-slate-800 rounded-bl-none' : 'bg-green-600 border-green-700 text-white rounded-br-none'}">
+            <p class="bubble-text text-xl font-medium leading-snug">${text}</p>
     `;
     
     if (explanation) {
-        html += `<p class="text-sm mt-3 pt-3 border-t ${isUser1Translation ? 'border-slate-100 text-slate-400' : 'border-green-500 text-green-100'} italic font-medium">(${explanation})</p>`;
+        html += `<p class="bubble-explanation text-sm mt-3 pt-3 border-t ${isUser1Translation ? 'border-slate-100 text-slate-400' : 'border-green-500 text-green-100'} italic font-medium">(${explanation})</p>`;
     }
     
     html += `</div>`;
@@ -171,6 +175,21 @@ function addTranslationToHistory(userNum, text, explanation = null) {
     
     chatHistory.appendChild(msgDiv);
     chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+function updateBubbleContent(id, text, explanation) {
+    const bubble = document.getElementById(id);
+    if (!bubble) return;
+    
+    const textElement = bubble.querySelector('.bubble-text');
+    textElement.innerText = text;
+    
+    if (explanation) {
+        const container = bubble.querySelector('.bubble-content');
+        const isUser1 = container.classList.contains('bg-white');
+        const explHtml = `<p class="bubble-explanation text-sm mt-3 pt-3 border-t ${isUser1 ? 'border-slate-100 text-slate-400' : 'border-green-500 text-green-100'} italic font-medium">(${explanation})</p>`;
+        container.insertAdjacentHTML('beforeend', explHtml);
+    }
 }
 
 function getFullLangCode(lang) {
