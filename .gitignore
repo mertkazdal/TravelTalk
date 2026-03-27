@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -205,3 +206,21 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+=======
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# App Specific
+.env
+temp_audio/*.mp3
+!temp_audio/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+>>>>>>> c87ea76 (Initial commit: TravelTalk Smart Tourist Translator)

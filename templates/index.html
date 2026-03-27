@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Turist Çevirmen</title>
+    <link rel="icon" href="data:,">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 font-sans h-screen flex flex-col overflow-hidden">
+    
+    <!-- Header -->
+    <header class="bg-white border-b p-4 flex justify-between items-center shadow-sm">
+        <h1 class="font-black text-blue-600 text-xl tracking-tighter">TRAVEL<span class="text-slate-400">TALK</span></h1>
+        <div id="lang-indicator" class="text-xs font-bold bg-slate-100 px-3 py-1 rounded-full text-slate-500 uppercase">
+            Sohbet Başlamadı
+        </div>
+    </header>
+
+    <!-- Language Selection (Setup) -->
+    <div id="setup-screen" class="flex-grow flex flex-col items-center justify-center p-6">
+        <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-md border border-slate-100">
+            <h2 class="text-2xl font-black mb-8 text-center text-slate-800">Dilleri Ayarla</h2>
+            <div class="space-y-6">
+                <div class="bg-blue-50 p-4 rounded-2xl">
+                    <label class="block text-blue-700 text-xs font-black uppercase mb-2">Senin Dilin</label>
+                    <select id="user1-lang" class="w-full bg-transparent font-bold text-lg outline-none cursor-pointer">
+                        <option value="tr">Türkçe</option>
+                        <option value="en">English</option>
+                        <option value="de">Deutsch</option>
+                    </select>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl">
+                    <label class="block text-slate-500 text-xs font-black uppercase mb-2">Karşı Tarafın Dili</label>
+                    <select id="user2-lang" class="w-full bg-transparent font-bold text-lg outline-none cursor-pointer">
+                        <option value="en" selected>English</option>
+                        <option value="tr">Türkçe</option>
+                        <option value="de">Deutsch</option>
+                        <option value="fr">Français</option>
+                        <option value="ru">Русский</option>
+                    </select>
+                </div>
+                <button id="start-btn" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
+                    BAŞLAT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Screen -->
+    <div id="chat-screen" class="hidden flex-grow flex flex-col overflow-hidden relative">
+        <div id="chat-history" class="flex-grow overflow-y-auto p-4 space-y-6 scroll-smooth">
+            <!-- Sadece çeviriler buraya gelecek -->
+        </div>
+
+        <div class="p-4 bg-white border-t pb-8">
+            <button id="action-btn" class="w-full py-6 rounded-3xl shadow-2xl font-black text-2xl uppercase tracking-wider text-white transition-all transform active:scale-95 relative overflow-hidden">
+                <span id="btn-text">SIRA SENDE</span>
+                <div class="absolute inset-0 bg-white/10 opacity-0 active:opacity-100 transition-opacity"></div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Recording Overlay (Modal) -->
+    <div id="record-overlay" class="fixed inset-0 bg-blue-600 z-50 flex flex-col items-center justify-center p-8 transition-transform translate-y-full">
+        <button id="close-record" class="absolute top-6 right-6 text-white text-3xl opacity-50"><i class="fas fa-times"></i></button>
+        
+        <div class="mb-12 relative">
+            <div class="absolute inset-0 bg-white/20 rounded-full animate-ping"></div>
+            <div class="relative bg-white text-blue-600 w-32 h-32 rounded-full flex items-center justify-center text-5xl shadow-2xl">
+                <i class="fas fa-microphone"></i>
+            </div>
+        </div>
+
+        <h3 id="record-status" class="text-white font-black text-2xl mb-4">Dinliyorum...</h3>
+        
+        <div class="w-full max-w-sm bg-white/10 border border-white/20 rounded-3xl p-6 min-h-[120px] mb-8">
+            <p id="live-transcript" class="text-white text-xl text-center italic opacity-60">Konuşmaya başlayın...</p>
+        </div>
+
+        <div id="record-actions" class="flex space-x-4 w-full max-w-sm hidden">
+            <button id="retry-btn" class="flex-1 bg-white/10 text-white py-4 rounded-2xl font-bold border border-white/30">TEKRARLA</button>
+            <button id="confirm-btn" class="flex-1 bg-white text-blue-600 py-4 rounded-2xl font-black text-xl shadow-xl">GÖNDER</button>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
